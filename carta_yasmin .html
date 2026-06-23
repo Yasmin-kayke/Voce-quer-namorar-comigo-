@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Para Yasmin 🏮</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --gold: #e8c04a;
+  --gold-light: #f5e090;
+  --deep: #1a0a2e;
+  --rose: #c8304a;
+  --parchment: #fdf6e8;
+  --ink: #3a1a10;
+}
+html, body { min-height: 100%; background: var(--deep); font-family: 'Lato', sans-serif; overflow-x: hidden; }
+
+#sky {
+  position: fixed; inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, #2d1655 0%, #1a0a2e 55%, #0a0515 100%);
+  z-index: 0;
+}
+.star { position: absolute; border-radius: 50%; background: #fff; animation: twinkle linear infinite; }
+@keyframes twinkle { 0%,100%{opacity:.2;transform:scale(1)} 50%{opacity:1;transform:scale(1.4)} }
+
+.lantern { position: fixed; bottom: -130px; display: flex; flex-direction: column; align-items: center; animation: float-up linear infinite; z-index: 1; pointer-events: none; }
+@keyframes float-up {
+  0%   { transform: translateY(0) translateX(0) rotate(-2deg); opacity: 0; }
+  8%   { opacity: 0.9; }
+  50%  { transform: translateY(-55vh) translateX(var(--drift)) rotate(2deg); }
+  92%  { opacity: 0.7; }
+  100% { transform: translateY(-115vh) translateX(calc(var(--drift)*1.6)) rotate(-1deg); opacity: 0; }
+}
+.lantern-body {
+  width: var(--w); height: calc(var(--w)*1.35);
+  background: radial-gradient(ellipse at 40% 35%, #fffbe0 0%, #f5c842 40%, #d4860a 100%);
+  border-radius: 45% 45% 50% 50% / 40% 40% 60% 60%;
+  position: relative;
+  box-shadow: 0 0 12px 4px rgba(245,200,66,.55), 0 0 30px 8px rgba(245,180,30,.3);
+}
+.lantern-body::before { content:''; position:absolute; inset:8% 15%; background:rgba(255,245,180,.35); border-radius:40% 40% 50% 50%; }
+.lantern-top { width:calc(var(--w)*.55); height:calc(var(--w)*.18); background:#b86a00; border-radius:4px 4px 0 0; margin-bottom:-2px; }
+.lantern-string { width:1px; height:calc(var(--w)*.22); background:rgba(200,160,50,.7); margin-top:-2px; }
+
+.sparkle { position:fixed; pointer-events:none; z-index:2; font-size:1rem; animation:sparkle-anim ease-out forwards; }
+@keyframes sparkle-anim { 0%{opacity:0;transform:scale(0) translateY(0)} 30%{opacity:1;transform:scale(1.2) translateY(-10px)} 100%{opacity:0;transform:scale(.3) translateY(-40px)} }
+
+/* Music player */
+#musicBar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: rgba(15,5,30,0.92);
+  border-top: 1px solid rgba(232,192,74,0.3);
+  padding: 10px 20px;
+  display: flex; align-items: center; gap: 12px;
+  z-index: 100;
+  backdrop-filter: blur(8px);
+}
+#musicBar .song-info { flex: 1; }
+#musicBar .song-title { font-family:'Cinzel',serif; font-size:12px; color:var(--gold-light); letter-spacing:.08em; }
+#musicBar .song-artist { font-size:11px; color:rgba(245,224,144,.5); margin-top:2px; }
+#playBtn {
+  background: rgba(232,192,74,0.15);
+  border: 1px solid var(--gold);
+  color: var(--gold-light);
+  width: 38px; height: 38px; border-radius: 50%;
+  font-size: 14px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .2s;
+  flex-shrink: 0;
+}
+#playBtn:hover { background: rgba(232,192,74,0.3); }
+.music-note { font-size:1rem; animation: note-float 2s ease-in-out infinite; }
+@keyframes note-float { 0%,100%{transform:translateY(0) rotate(-5deg)} 50%{transform:translateY(-4px) rotate(5deg)} }
+.music-hint { font-size:11px; color:rgba(245,224,144,.55); font-style:italic; }
+
+#content { position:relative; z-index:10; min-height:100vh; display:flex; align-items:center; justify-content:center; flex-direction:column; padding:2rem 1rem 5rem; }
+
+/* Envelope */
+#envelopeWrap { display:flex; flex-direction:column; align-items:center; gap:1.2rem; }
+.to-name { font-family:'Cinzel',serif; font-size:16px; color:var(--gold-light); letter-spacing:.15em; text-align:center; text-shadow:0 0 16px rgba(245,224,144,.7); margin-bottom:.5rem; }
+.envelope { width:260px; height:180px; position:relative; cursor:pointer; transition:transform .25s; }
+.envelope:hover { transform:scale(1.05) rotate(1deg); }
+.env-body { position:absolute; inset:0; background:var(--parchment); border:2px solid #c8a060; border-radius:4px; overflow:hidden; }
+.env-left { position:absolute; bottom:0;left:0; width:0;height:0; border-left:130px solid #e8d8b0; border-top:90px solid transparent; }
+.env-right { position:absolute; bottom:0;right:0; width:0;height:0; border-right:130px solid #ddc898; border-top:90px solid transparent; }
+.env-bottom { position:absolute; bottom:0;left:0;right:0; height:50%; background:#f0e0b0; }
+.env-flap { position:absolute; top:0;left:-1px;right:-1px; height:55%; background:linear-gradient(160deg,#fdf6e8 0%,#eddba0 100%); clip-path:polygon(0 0,100% 0,50% 100%); border-bottom:1px solid #c8a060; transform-origin:top center; transition:transform .7s cubic-bezier(.4,0,.2,1); z-index:3; }
+.envelope.open .env-flap { transform:rotateX(180deg); }
+.env-seal { position:absolute; z-index:4; font-size:2.2rem; top:50%;left:50%; transform:translate(-50%,-20%); transition:opacity .3s; filter:drop-shadow(0 2px 6px rgba(232,192,74,.6)); }
+.envelope.open .env-seal { opacity:0; }
+.tap-hint { color:var(--gold-light); font-size:14px; letter-spacing:.08em; text-align:center; text-shadow:0 0 12px rgba(245,224,144,.8); animation:pulse-hint 2s ease-in-out infinite; }
+@keyframes pulse-hint { 0%,100%{opacity:.7} 50%{opacity:1} }
+
+/* Letter */
+#letterWrap { display:none; flex-direction:column; align-items:center; width:100%; max-width:580px; gap:1.2rem; }
+#letterWrap.visible { display:flex; }
+
+.letter-page { background:var(--parchment); border:1.5px solid #c8a060; border-radius:3px; padding:2.2rem 2.5rem; width:100%; display:none; position:relative; box-shadow:0 4px 32px rgba(0,0,0,.5),0 0 0 1px rgba(200,160,80,.2); }
+.letter-page.active { display:block; animation:page-in .5s ease forwards; }
+@keyframes page-in { from{opacity:0;transform:translateY(20px) scale(.98)} to{opacity:1;transform:translateY(0) scale(1)} }
+.letter-page::before { content:''; position:absolute; inset:0; background-image:repeating-linear-gradient(transparent,transparent 27px,rgba(180,140,80,.12) 28px); pointer-events:none; border-radius:3px; }
+
+.page-ornament { text-align:center; font-size:1.1rem; color:var(--gold); letter-spacing:.5em; margin-bottom:1.2rem; font-family:'Cinzel',serif; text-shadow:0 0 8px rgba(232,192,74,.5); }
+.letter-text { font-family:'EB Garamond',serif; font-size:16px; line-height:1.9; color:var(--ink); position:relative; z-index:1; }
+.letter-text p { margin-bottom:.9rem; }
+.letter-verse { font-style:italic; font-size:15px; color:#7a3010; border-left:3px solid var(--gold); padding-left:1rem; margin:1.2rem 0; line-height:1.8; }
+.letter-em { font-style:italic; color:#8a2020; }
+
+.nav-row { display:flex; align-items:center; gap:1rem; }
+.nav-btn { background:transparent; border:1.5px solid var(--gold); color:var(--gold-light); padding:8px 24px; border-radius:30px; font-family:'Cinzel',serif; font-size:12px; cursor:pointer; letter-spacing:.1em; transition:all .2s; }
+.nav-btn:hover { background:rgba(232,192,74,.15); }
+.nav-btn:disabled { opacity:.25; cursor:default; }
+.page-ind { font-size:12px; color:var(--gold); font-family:'Cinzel',serif; letter-spacing:.1em; }
+
+/* Final page */
+.final-page { text-align:center; background:linear-gradient(160deg,#fdf6e8 0%,#fef0d0 100%); }
+.big-question { font-family:'Cinzel',serif; font-size:22px; color:#8a1030; margin:1.5rem 0 .6rem; line-height:1.5; text-shadow:0 1px 3px rgba(0,0,0,.1); }
+.answer-row { display:flex; gap:1rem; justify-content:center; margin-top:1.4rem; flex-wrap:wrap; }
+.btn-yes { background:linear-gradient(135deg,#c8304a,#a01828); color:#fff; border:none; padding:13px 36px; border-radius:30px; font-size:16px; font-family:'Cinzel',serif; cursor:pointer; box-shadow:0 3px 18px rgba(200,48,74,.4); transition:all .2s; letter-spacing:.05em; }
+.btn-yes:hover { transform:scale(1.07); box-shadow:0 6px 26px rgba(200,48,74,.55); }
+.btn-no { background:transparent; color:#a06040; border:1.5px solid #c8a060; padding:13px 36px; border-radius:30px; font-size:16px; font-family:'Cinzel',serif; cursor:pointer; transition:all .25s; position:relative; }
+
+/* Yes scene */
+#yesScene { display:none; text-align:center; padding:2.5rem 2rem; background:var(--parchment); border:1.5px solid #c8a060; border-radius:3px; width:100%; max-width:580px; box-shadow:0 4px 32px rgba(0,0,0,.5); }
+#yesScene.visible { display:block; animation:page-in .6s ease forwards; }
+.yes-title { font-family:'Cinzel',serif; font-size:20px; color:#8a1030; margin:1rem 0 .5rem; line-height:1.5; }
+.yes-name { font-family:'Cinzel',serif; font-size:26px; color:#6a0a20; display:block; margin-bottom:1rem; }
+.yes-body { font-family:'EB Garamond',serif; font-size:16px; color:var(--ink); line-height:1.9; font-style:italic; }
+.lanterns-row { font-size:2.2rem; letter-spacing:.5rem; margin:1rem 0; display:block; animation:gentle-sway 3s ease-in-out infinite; }
+@keyframes gentle-sway { 0%,100%{transform:translateY(0) rotate(-1deg)} 50%{transform:translateY(-6px) rotate(1deg)} }
+</style>
+</head>
+<body>
+
+<div id="sky"></div>
+
+<!-- Music bar -->
+<div id="musicBar">
+  <button id="playBtn" onclick="toggleMusic()" title="Tocar música">▶</button>
+  <div class="song-info">
+    <div class="song-title">🎵 I See the Light</div>
+    <div class="song-artist">Enrolados — Mandy Moore &amp; Zachary Levi</div>
+  </div>
+  <span class="music-note">🏮</span>
+  <span class="music-hint">clique para tocar</span>
+</div>
+
+<!-- YouTube iframe oculto -->
+<iframe id="ytPlayer" width="0" height="0" style="position:absolute;opacity:0;pointer-events:none;"
+  src="" frameborder="0" allow="autoplay" allowfullscreen></iframe>
+
+<div id="content">
+
+  <div id="envelopeWrap">
+    <p class="to-name">✦ Para Yasmin ✦</p>
+    <div class="envelope" id="envelope" onclick="openEnvelope()">
+      <div class="env-body">
+        <div class="env-bottom"></div>
+        <div class="env-left"></div>
+        <div class="env-right"></div>
+      </div>
+      <div class="env-flap"></div>
+      <span class="env-seal">🏮</span>
+    </div>
+    <p class="tap-hint">toque para abrir ✨</p>
+  </div>
+
+  <div id="letterWrap">
+
+    <div class="letter-page active" id="page-1">
+      <div class="page-ornament">🏮 ✦ 🏮</div>
+      <div class="letter-text">
+        <p>Yasmin,</p>
+        <p>Eu fiquei pensando em como escrever esta carta e percebi que nenhuma palavra consegue expressar exatamente tudo o que sinto por você. Mesmo assim, quero tentar.</p>
+        <p>Desde que você apareceu na minha vida, meus dias ficaram diferentes. Você se tornou alguém com quem eu gosto de conversar, rir, compartilhar momentos e sonhar sobre o futuro. Quanto mais eu te conheço, mais eu admiro a mulher que você é.</p>
+        <p>Sua beleza foi uma das primeiras coisas que me chamou atenção, seria mentira dizer que não. Mas o que realmente me fez me apaixonar foi o seu coração.</p>
+        <p class="letter-em">Sua forma de amar a Deus, sua alegria, seu jeito de cuidar das pessoas e a paz que você transmite.</p>
+      </div>
+    </div>
+
+    <div class="letter-page" id="page-2">
+      <div class="page-ornament">✦ 🕊️ ✦</div>
+      <div class="letter-text">
+        <p>Existe algo que eu não poderia deixar de mencionar.</p>
+        <p>Em algum momento da nossa história, eu tive a oportunidade de escolher você e não escolhi. Hoje eu reconheço que aquilo aconteceu por causa da minha imaturidade.</p>
+        <p>Naquela época, eu ainda não entendia muitas coisas. Não entendia o peso de uma decisão, o valor de um relacionamento e nem o que realmente significa enxergar alguém como uma possível companheira para a vida.</p>
+        <p>Eu sei que minhas atitudes te magoaram profundamente. Eu quero que saiba que <span class="letter-em">sinto muito.</span></p>
+        <p>Mas Deus tem trabalhado no meu coração.</p>
+      </div>
+    </div>
+
+    <div class="letter-page" id="page-3">
+      <div class="page-ornament">✦ 🌿 ✦</div>
+      <div class="letter-text">
+        <p>Desde então, muita coisa mudou. Eu me batizei, amadureci e comecei a entender que relacionamentos não são sobre viver emoções passageiras ou pensar apenas no próximo ano. São sobre propósito, compromisso e construção.</p>
+        <p>Aprendi que escolher alguém não é decidir quem estará ao seu lado pelos próximos meses, mas quem você gostaria de ter ao seu lado durante toda a caminhada.</p>
+        <p class="letter-em">Não estou aqui porque me senti sozinho.<br>Não estou aqui porque o tempo passou.<br>Não estou aqui porque surgiu uma nova oportunidade.</p>
+        <p>Estou aqui porque hoje sou um homem diferente daquele que um dia teve medo de escolher. E você, Yasmin, merecia ser escolhida desde o início.</p>
+      </div>
+    </div>
+
+    <div class="letter-page" id="page-4">
+      <div class="page-ornament">🌹 ✦ 🌹</div>
+      <div class="letter-text">
+        <p>Não posso mudar o passado, mas posso decidir quem quero ser daqui para frente.</p>
+        <p>Eu não quero um relacionamento baseado apenas em sentimentos. Quero um relacionamento onde possamos crescer juntos, orar juntos, servir a Deus juntos e ajudar um ao outro a nos aproximarmos mais de Cristo.</p>
+        <div class="letter-verse">"Melhor é serem dois do que um."<br>— Eclesiastes 4:9</div>
+        <p>E é exatamente assim que me sinto quando penso em você. Você tornou a caminhada mais leve, mais bonita e muito mais especial. Seu sorriso, sua fé, sua alegria — tudo em você me faz querer ser um homem melhor todos os dias.</p>
+      </div>
+    </div>
+
+    <div class="letter-page final-page" id="page-5">
+      <div class="page-ornament">🏮 ✦ 🏮</div>
+      <div class="letter-text">
+        <p>Talvez os Enrolados e os seus doramas tenham te ensinado a gostar de histórias de amor, Yasmin. Eu não posso te prometer um conto de fadas, porque a vida real não é assim. Mas posso prometer algo melhor: <span class="letter-em">sinceridade, respeito, cuidado, oração</span> e a vontade de construir algo bonito ao seu lado, com Deus sendo o centro de tudo.</p>
+        <p>Assim como Rapunzel viu as lanternas e soube que aquele era o momento certo — eu olho para você e sei que é agora. Não amanhã, não quando eu estiver mais preparado. Agora.</p>
+        <p style="text-align:center; font-family:'Cinzel',serif; font-size:14px; color:#8a4020; letter-spacing:.05em;">Com todo o meu coração,</p>
+      </div>
+      <p class="big-question">Yasmin, você aceita namorar comigo?</p>
+      <div class="answer-row">
+        <button class="btn-yes" onclick="yesAnswer()">Sim, aceito 🏮</button>
+        <button class="btn-no" id="btnNo" onmouseover="runAway(this)" ontouchstart="runAway(this)">Não...</button>
+      </div>
+    </div>
+
+    <div class="nav-row" id="navRow">
+      <button class="nav-btn" id="prevBtn" onclick="prevPage()" disabled>← anterior</button>
+      <span class="page-ind" id="pageInd">1 / 5</span>
+      <button class="nav-btn" id="nextBtn" onclick="nextPage()">próxima →</button>
+    </div>
+
+  </div>
+
+  <!-- Yes scene -->
+  <div id="yesScene">
+    <span class="lanterns-row">🏮 🏮 🏮</span>
+    <p class="yes-title">Você disse sim, Yasmin. ✨</p>
+    <span class="yes-name">🌹 Obrigado ❤️ 🌹</span>
+    <p class="yes-body">
+      Eu prometo ser digno dessa escolha.<br><br>
+      Quero crescer ao seu lado na fé,<br>
+      orar com você nos momentos difíceis,<br>
+      e celebrar cada conquista juntos.<br><br>
+      Assim como as lanternas iluminam o céu desta noite,<br>
+      quero que o nosso amor ilumine cada dia da nossa caminhada.<br><br>
+      Com Deus no centro, acredito que a nossa história<br>
+      vai ser muito mais bonita do que qualquer conto de fadas. 🕊️
+    </p>
+    <span class="lanterns-row" style="margin-top:1.2rem;">🌹 ❤️ 🌹</span>
+  </div>
+
+</div>
+
+<script>
+// Stars
+(function(){
+  const sky = document.getElementById('sky');
+  for(let i=0;i<120;i++){
+    const s=document.createElement('div');
+    s.className='star';
+    const sz=Math.random()*2.5+.5;
+    s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;animation-duration:${2+Math.random()*4}s;animation-delay:${Math.random()*5}s;`;
+    sky.appendChild(s);
+  }
+})();
+
+// Lanterns
+const sizes=[38,52,44,60,36,48];
+const cols=[5,14,24,34,46,58,68,78,88,95];
+let li=0;
+function spawnLantern(){
+  const wrap=document.createElement('div');
+  wrap.className='lantern';
+  const w=sizes[Math.floor(Math.random()*sizes.length)];
+  const pos=cols[li%cols.length]; li++;
+  const dur=14+Math.random()*10;
+  const drift=(Math.random()-.5)*80;
+  wrap.style.cssText=`left:${pos}%;--w:${w}px;--drift:${drift}px;animation-duration:${dur}s;animation-delay:${Math.random()*2}s;`;
+  wrap.innerHTML=`<div class="lantern-top"></div><div class="lantern-body"></div><div class="lantern-string"></div>`;
+  document.body.appendChild(wrap);
+  setTimeout(()=>wrap.remove(),(dur+4)*1000);
+}
+spawnLantern();
+setInterval(spawnLantern,1800);
+
+// Sparkles
+document.addEventListener('click',function(e){
+  const em=['✨','🌟','💫','⭐','🏮'];
+  for(let i=0;i<4;i++){
+    const sp=document.createElement('span');
+    sp.className='sparkle';
+    sp.textContent=em[Math.floor(Math.random()*em.length)];
+    sp.style.cssText=`left:${e.clientX+(Math.random()-.5)*60}px;top:${e.clientY+(Math.random()-.5)*40}px;animation-duration:${.8+Math.random()*.5}s;animation-delay:${i*.08}s;`;
+    document.body.appendChild(sp);
+    setTimeout(()=>sp.remove(),1400);
+  }
+});
+
+// Music
+let playing=false;
+function toggleMusic(){
+  const btn=document.getElementById('playBtn');
+  const frame=document.getElementById('ytPlayer');
+  if(!playing){
+    frame.src='https://www.youtube.com/embed/4JMp8mQshI4?autoplay=1&start=0&enablejsapi=1';
+    btn.textContent='⏸';
+    playing=true;
+    document.querySelector('.music-hint').textContent='tocando...';
+  } else {
+    frame.src='';
+    btn.textContent='▶';
+    playing=false;
+    document.querySelector('.music-hint').textContent='clique para tocar';
+  }
+}
+
+// Envelope
+function openEnvelope(){
+  const env=document.getElementById('envelope');
+  env.classList.add('open');
+  if(!playing) toggleMusic();
+  setTimeout(()=>{
+    document.getElementById('envelopeWrap').style.display='none';
+    document.getElementById('letterWrap').classList.add('visible');
+  },750);
+}
+
+// Pages
+let current=1;
+const total=5;
+function showPage(n){
+  document.querySelectorAll('.letter-page').forEach(p=>p.classList.remove('active'));
+  const pg=document.getElementById('page-'+n);
+  if(pg){pg.classList.add('active');void pg.offsetWidth;}
+  document.getElementById('pageInd').textContent=n+' / '+total;
+  document.getElementById('prevBtn').disabled=n<=1;
+  document.getElementById('nextBtn').disabled=n>=total;
+  document.getElementById('navRow').style.display=n===total?'none':'flex';
+}
+function nextPage(){if(current<total){current++;showPage(current);}}
+function prevPage(){if(current>1){current--;showPage(current);}}
+
+// No button
+let noCount=0;
+function runAway(btn){
+  noCount++;
+  const rx=(Math.random()-.5)*240;
+  const ry=(Math.random()-.5)*120;
+  btn.style.transition='transform .3s ease';
+  btn.style.transform=`translate(${rx}px,${ry}px)`;
+  if(noCount>=5){btn.style.opacity='0';btn.style.pointerEvents='none';}
+}
+
+// Yes
+function yesAnswer(){
+  document.getElementById('letterWrap').style.display='none';
+  document.getElementById('yesScene').classList.add('visible');
+  for(let i=0;i<10;i++) setTimeout(spawnLantern,i*180);
+}
+</script>
+</body>
+</html>
